@@ -1,0 +1,110 @@
+type PriceCandle @entity {
+  id: ID!
+  token: String!
+  open: BigInt
+  high: BigInt
+  low: BigInt
+  close: BigInt
+  timestamp: Int! # start of period
+  period: String!
+  amount: BigInt
+  vol: BigInt
+}
+
+type TransactionDepth @entity {
+  id: ID!
+  token: String!
+  amount: BigInt!
+  price: BigInt!
+  lmtPrice: BigInt!
+  stpPrice: BigInt!
+  status: String!
+  isLong: Boolean!
+  delFlag: Boolean!
+}
+
+type PositionTrigger @entity {
+  id: ID!
+  account: String!
+  indexToken: String!
+  isLong:Boolean!
+  posId: BigInt!
+  status: String!
+  triggers: [Trigger!]! @derivedFrom(field: "order")
+}
+
+type Trigger @entity {
+  id: ID!
+  amountPercent: BigInt!
+  createdAt: Int!
+  isTP: Boolean!
+  price: BigInt!
+  status: String!
+  triggeredAmount: BigInt!
+  triggeredAt: Int!
+  order: PositionTrigger! @belongsTo
+}
+
+type UserPositionStat @entity {
+  id: ID!
+  account: String!
+  averagePrice: BigInt!
+  collateral: BigInt!
+  closedAt: Int!
+  closeHash: String!
+  createdAt: Int!
+  createHash: String!
+  entryFundingRate: BigInt!
+  feeUsd: BigInt!
+  indexToken: String!
+  isLong:Boolean!
+  key: String!
+  lmtPrice: BigInt!
+  markPrice: BigInt!
+  posId: BigInt!
+  positionStatus: String!
+  positionType: String!
+  realisedPnl: BigInt!
+  reserveAmount: BigInt!
+  size: BigInt!
+  stpPrice: BigInt!
+}
+
+type UserOrder @entity {
+  id: ID!
+  account: String!
+  indexToken: String!
+  isLong:Boolean!
+  pendingCollateral: BigInt!
+  orderStatus: String!
+  positionType:String!
+  stepType:BigInt!
+  stepAmount: BigInt!
+  lmtPrice: BigInt!
+  stpPrice: BigInt!
+  pendingDelayCollateral: BigInt!
+  pendingDelaySize: BigInt!
+  posId: BigInt!
+  createdAt: Int!
+}
+
+type UserTrade @entity {
+  id: ID!
+  account: String!
+  actionType: String!
+  amount: BigInt!
+  averagePrice: BigInt!
+  collateral: BigInt!
+  createdAt: Int!
+  fees: BigInt!
+  indexToken: String!
+  isLong:Boolean!
+  isPlus: Boolean!
+  key: String!
+  markPrice: BigInt!
+  posId: BigInt!
+  positionType: String!
+  profitLoss: BigInt!
+  tradeVolume: BigInt!
+  transactionHash: String!
+}

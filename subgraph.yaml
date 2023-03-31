@@ -1,0 +1,115 @@
+specVersion: 0.0.5
+schema:
+  file: ./schema.graphql
+dataSources:
+  # ETH PriceCandle -- price
+  - kind: ethereum
+    name: FastPriceFeedEth
+    network: arbitrum-one
+    source:
+      address: "0x2a644Cbc0F5A0D3F5292D3c6ABdF6F16c95E4c7C"
+      abi: FastPriceFeed
+      startBlock: 74155100
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - PriceCandle
+      abis:
+        - name: FastPriceFeed
+          file: ./abis/FastPriceFeed.json
+      eventHandlers:
+        - event: SetLatestAnswer(uint256)
+          handler: handleSetLatestAnswerEth
+      file: ./src/fast-price-feed.ts
+  # token PriceCandle -- amount and vol
+  - kind: ethereum
+    name: updatePosition
+    network: arbitrum-one
+    source:
+      address: "0xDa1a7ea276fbdB16ebaBB5b38257b1D56B302E4a"
+      abi: VaultUtils
+      startBlock: 74155100
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - PriceCandle
+      abis:
+        - name: VaultUtils
+          file: ./abis/VaultUtils.json
+      eventHandlers:
+        - event: IncreasePosition(bytes32,indexed address,indexed address,bool,uint256,uint256[7])
+          handler: handleIncreasePosition
+        - event: DecreasePosition(bytes32,indexed address,indexed address,bool,uint256,int256,uint256[7])
+          handler: handleDecreasePosition
+        - event: ClosePosition(bytes32,int256,uint256,uint256)
+          handler: handleClosePosition
+        - event: LiquidatePosition(bytes32,int256,uint256,uint256)
+          handler: handleLiquidatePosition
+      file: ./src/vault-utils.ts
+
+  # 1. order depth  2. userOrders
+  - kind: ethereum
+    name: PositionVault
+    network: arbitrum-one
+    source:
+      address: "0x79e04946F0eD05a60395F3c9A4ae4A7D84eca80e"
+      abi: PositionVault
+      startBlock: 74155100
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - TransactionDepth
+        - UserPositionStat
+      abis:
+        - name: PositionVault
+          file: ./abis/PositionVault.json
+      eventHandlers:
+        - event: NewOrder(bytes32,indexed address,address,bool,uint256,uint256,uint8,uint256[]) #newPositionOrder
+          handler: handleNewOrder
+        - event: UpdateOrder(bytes32,uint256,uint8)   # cancelPendingOrder,triggerPosition
+          handler: handleUpdateOrder
+        - event: AddPosition(indexed bytes32,bool,uint256,uint256)
+          handler: handleAddPosition
+        - event: ConfirmDelayTransaction(indexed bytes32,bool,uint256,uint256,uint256)
+          handler: handleConfirmDelayTransaction
+        - event: AddOrRemoveCollateral(indexed bytes32,bool,uint256,uint256,uint256,uint256)
+          handler: handleAddOrRemoveCollateral
+        - event: AddTrailingStop(bytes32,uint256[])
+          handler: handleAddTrailingStop
+        - event: UpdateTrailingStop(bytes32,uint256)
+          handler: handleUpdateTrailingStop
+      file: ./src/position-vault.ts
+
+  # 1. userOrders
+  - kind: ethereum
+    name: TriggerOrder
+    network: arbitrum-one
+    source:
+      address: "0xb9803F107C6102CAceD5039062Df8B9251Cb9A94"
+      abi: TriggerOrderManager
+      startBlock: 74155100
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - PositionTrigger
+        - Trigger
+        - UserPositionStat
+      abis:
+        - name: TriggerOrderManager
+          file: ./abis/TriggerOrderManager.json
+      eventHandlers:
+        - event: ExecuteTriggerOrders(bytes32,uint256[],uint256[],uint256[],uint256[],uint256[],uint256[],uint8)
+          handler: handleExecuteTriggerOrders
+        - event: UpdateTriggerOrders(bytes32,uint256[],uint256[],uint256[],uint256[],uint256[],uint256[],uint8)
+          handler: handleUpdateTriggerOrders
+        - event: UpdateTriggerStatus(bytes32,uint8)
+          handler: handleUpdateTriggerStatus
+      file: ./src/trigger-order.ts

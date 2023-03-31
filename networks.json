@@ -1,0 +1,8 @@
+{
+  "arbitrum-one": {
+    "FastPriceFeed": {
+      "address": "0xC4b06f0c9D227CE442c0fC056752c1AF22e126Ba",
+      "startBlock": 72325091
+    }
+  }
+}

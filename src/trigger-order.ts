@@ -1,11 +1,11 @@
 import {UpdateOrder} from "../generated/PositionVault/PositionVault";
+import {PositionTrigger, Trigger, UserPositionStat} from "../generated/schema";
+import {BigInt} from "@graphprotocol/graph-ts";
 import {
     ExecuteTriggerOrders,
     UpdateTriggerOrders,
     UpdateTriggerStatus
-} from "../generated/TriggerOrderManager/TriggerOrderManager";
-import {PositionTrigger, Trigger, UserPositionStat} from "../generated/schema";
-import {BigInt} from "@graphprotocol/graph-ts";
+} from "../generated/TriggerOrder/TriggerOrderManager";
 
 export function handleExecuteTriggerOrders(event: ExecuteTriggerOrders): void {
     updateTriggerOrders(
